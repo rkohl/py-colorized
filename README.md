@@ -1,6 +1,6 @@
-# Colorize
+# Py Colorized
 
-Colorize is a small, typed Python library for manipulating colors in the OKLCH
+Py Colorized is a small, typed Python library for manipulating colors in the OKLCH
 color space. It provides immutable color values, lightness and saturation
 adjustments, color harmonies, WCAG contrast helpers, and palette/theme
 generation.
@@ -14,13 +14,13 @@ generation.
 Install the package from this repository:
 
 ```bash
-python pip install py-colorized
+python -m pip install py-colorized
 ```
 
 ## Usage
 
 ```python
-from colorize import Colorize
+from colorized import Colorize
 
 brand = Colorize("#336699")
 
@@ -71,7 +71,7 @@ values with an alpha channel.
 channel is present.
 
 ```python
-from colorize import HexColor, Palettes
+from colorized import HexColor, Palettes
 
 color = HexColor("abc8")
 
@@ -91,7 +91,7 @@ print(transparent_blue)  # #33669980
 
 `Colorize` uses typed model objects where a result has named components. The
 palette models are available through `Palettes`; lower-level helper types are
-available from `colorize.types`.
+available from `colorized.types`.
 
 | API | Return type | Description |
 | --- | --- | --- |
@@ -122,8 +122,8 @@ available from `colorize.types`.
 Palette results expose both named fields and ordered list helpers:
 
 ```python
-from colorize import Colorize, Palettes
-from colorize.types import Harmonics, Level, Rating, WCAG
+from colorized import Colorize, Palettes
+from colorized.types import Harmonics, Level, Rating, WCAG
 
 brand = Colorize("#336699")
 
