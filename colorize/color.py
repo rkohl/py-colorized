@@ -9,6 +9,16 @@ from colorize.types import WCAG, Colors, ColorTheme, Harmonics, HexColor, Palett
 
 @dataclass(frozen=True)
 class Colorize:
+  """An immutable hexadecimal color backed by the OKLCH color space.
+
+  ``Colorize`` normalizes hexadecimal input and exposes operations for color
+  adjustment, harmony generation, contrast evaluation, and palette/theme
+  generation. Operations return new values and never mutate the source color.
+
+  Attributes:
+    hex: The normalized hexadecimal value.
+  """
+
   hex: HexColor
   _color: CAColor = field(repr=False, compare=False, hash=False)
 
@@ -148,6 +158,8 @@ class Colorize:
 
   @property
   def palette(self) -> Palettes.Full:
+    """Generate the standard lightness palette for this color."""
+
     hue = self.hue
     chroma = self.chroma
 
@@ -169,6 +181,8 @@ class Colorize:
 
   @property
   def theme(self) -> ColorTheme:
+    """Generate a theme derived from this color."""
+
     return ColorTheme(
       primary=self,
       primary_text=self.wcag().best_text_color(),

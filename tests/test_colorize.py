@@ -2,7 +2,8 @@ import math
 
 import pytest
 
-from colorize import Colorize, ColorTheme, Palettes, WCAGRating
+from colorize import Colorize, ColorTheme, HexColor, Palettes
+from colorize.types import Colors, Level, Rating
 
 
 def hue_distance(left: float, right: float) -> float:
@@ -10,10 +11,16 @@ def hue_distance(left: float, right: float) -> float:
 
 
 class TestConstruction:
+  def test_public_namespace_exposes_hex_color(self) -> None:
+    assert HexColor("#abc") == Colorize("#abc").hex
+
+  def test_color_collection_alias_is_safe_to_inspect(self) -> None:
+    assert Colors.__value__ == list["Colorize"]
+
   def test_normalizes_short_hex_and_whitespace(self) -> None:
     color = Colorize("  abc  ")
 
-    assert color.hex == "#aabbcc"
+    assert str(color.hex) == "#aabbcc"
     assert str(color) == "#aabbcc"
     assert repr(color) == "Colorize('#aabbcc')"
 
@@ -32,7 +39,7 @@ class TestConstruction:
   def test_exposes_oklch_components(self) -> None:
     color = Colorize("#336699")
 
-    assert color.oklch == (color.lightness, color.chroma, color.hue)
+    assert color.oklch == Palettes.Oklch(color.lightness, color.chroma, color.hue)
     assert 0 <= color.lightness <= 1
     assert color.chroma >= 0
     assert 0 <= color.hue < 360
@@ -95,27 +102,27 @@ class TestCollectionsAndHarmonies:
 
   def test_harmonies_include_base_color_and_expected_hue_offsets(self) -> None:
     color = Colorize("#336699")
-    complement = color.complement()
-    analogous = color.analogous()
-    triadic = color.triadic()
-    split = color.split_complementary()
+    complement = color.harmonies.complement
+    analogous = color.harmonies.analogous()
+    triadic = color.harmonies.triadic
+    split = color.harmonies.split_complementary()
 
     assert hue_distance(complement.hue, (color.hue + 180) % 360) < 1
-    assert analogous[1] is color
-    assert triadic[0] is color
-    assert split[0] is color
-    assert hue_distance(triadic[1].h, (color.hue + 120) % 360) < 1
-    assert hue_distance(triadic[2].h, (color.hue + 240) % 360) < 1
+    assert analogous.secondary is color
+    assert triadic.primary is color
+    assert split.primary is color
+    assert hue_distance(triadic.secondary.hue, (color.hue + 120) % 360) < 1
+    assert hue_distance(triadic.tertiary.hue, (color.hue + 240) % 360) < 1
 
   def test_monochromatic_scale_preserves_order_and_size(self) -> None:
-    colors = Colorize("#336699").monochromatic(5)
+    colors = Colorize("#336699").harmonies.monochromatic(5)
 
     assert len(colors) == 5
     assert [color.lightness for color in colors] == sorted(color.lightness for color in colors)
 
   def test_monochromatic_scale_requires_at_least_two_colors(self) -> None:
     with pytest.raises(ValueError, match="count must be at least two"):
-      Colorize("#336699").monochromatic(1)
+      Colorize("#336699").harmonies.monochromatic(1)
 
 
 class TestContrastAndGeneratedOutput:
@@ -124,25 +131,23 @@ class TestContrastAndGeneratedOutput:
     white = Colorize("#ffffff")
 
     assert black.contrast_ratio(white) == pytest.approx(21)
-    assert black.wcag_rating(white) == WCAGRating(
+    assert black.wcag(white).rating == Rating(
       ratio=21.0,
-      AA_normal=True,
-      AA_large=True,
-      AAA_normal=True,
-      AAA_large=True,
+      aa=Level(normal=True, large=True),
+      aaa=Level(normal=True, large=True),
     )
 
   @pytest.mark.parametrize(("background", "expected"), [("#000000", "#ffffff"), ("#ffffff", "#000000")])
   def test_best_text_color_maximizes_contrast(self, background: str, expected: str) -> None:
-    assert Colorize(background).best_text_color() == Colorize(expected)
+    assert Colorize(background).wcag().best_text_color() == Colorize(expected)
 
   def test_light_and_dark_are_complementary_classifications(self) -> None:
     for color in (Colorize("#000000"), Colorize("#ffffff"), Colorize("#336699")):
-      assert color.is_light() is not color.is_dark()
+      assert color.wcag().is_light is not color.wcag().is_dark
 
   def test_contrast_shade_selects_best_generated_candidate(self) -> None:
     color = Colorize("#336699")
-    result = color.contrast_shade(steps=5)
+    result = color.wcag().shade(steps=5)
     candidates = color.tints(5) + color.shades(5)
 
     assert result in candidates
@@ -150,27 +155,33 @@ class TestContrastAndGeneratedOutput:
 
   def test_contrast_shade_rejects_non_positive_steps(self) -> None:
     with pytest.raises(ValueError, match="steps must be greater than zero"):
-      Colorize("#336699").contrast_shade(steps=0)
+      Colorize("#336699").wcag().shade(steps=0)
 
   def test_palette_has_standard_stops_and_preserves_base_at_500(self) -> None:
     color = Colorize("#336699")
-    palette = color.generate_palette()
+    palette = color.palette
 
     assert list(palette) == [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950]
     assert palette[500] == color
 
   def test_theme_contains_coherent_generated_values(self) -> None:
     color = Colorize("#336699")
-    theme = color.generate_theme()
+    theme = color.theme
 
     assert isinstance(theme, ColorTheme)
     assert theme.primary is color
-    assert theme.primary_text == color.best_text_color()
+    assert theme.primary_text == color.wcag().best_text_color()
     assert theme.palette[500] == color
+
+  def test_theme_serializes_nested_colors_without_recursion(self) -> None:
+    serialized = Colorize("#336699").theme.serialize
+
+    assert serialized["primary"] == {"hex": {"hex": "#336699", "has_alpha": False}}
+    assert serialized["palette"][500] == serialized["primary"]
 
   def test_palette_models_are_available_from_public_namespace(self) -> None:
     primary = Colorize("#336699")
-    secondary = primary.complement()
+    secondary = primary.harmonies.complement
     palette = Palettes.Dual(primary, secondary)
 
     assert palette == Palettes.DualPalette(primary=primary, secondary=secondary)

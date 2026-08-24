@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-
-from colorize.color import Colorize
+from typing import TYPE_CHECKING
 
 from .._util import Serializable
 from .palette import Full, Triadic
+
+if TYPE_CHECKING:
+  from colorize.color import Colorize
 
 
 @dataclass(frozen=True)

@@ -1,10 +1,54 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-
-from colorize.color import Colorize
+from typing import TYPE_CHECKING
 
 from .._util import Serializable
+
+if TYPE_CHECKING:
+  from colorize.color import Colorize
+
+
+@dataclass(frozen=True)
+class RGB(Serializable):
+  """
+  A color in the RGB color space.
+
+  Attributes:
+    `red`: The red value.
+    `green`: The green value.
+    `blue`: The blue value.
+    `alpha`: The alpha value.
+
+  Protocol:
+    `serialize`: A property that returns a dictionary representation of the object.
+  """
+
+  red: int
+  green: int
+  blue: int
+  alpha: int = 255
+
+  @property
+  def has_alpha(self) -> bool:
+    """
+    Check if the color has an alpha channel.
+    """
+    return self.alpha < 255
+
+  @property
+  def rgb(self) -> list[int]:
+    """
+    Return the color as an RGB list.
+    """
+    return [self.red, self.green, self.blue]
+
+  @property
+  def rgba(self) -> list[int]:
+    """
+    Return the color as an RGBA list.
+    """
+    return [self.red, self.green, self.blue, self.alpha]
 
 
 @dataclass(frozen=True)
@@ -86,4 +130,5 @@ Dual = DualPalette
 Triadic = TriadicPalette
 Quadratic = QuadraticPalette
 Oklch = OklchPalette
+RGBA = RGB
 type Full = dict[int, Colorize]

@@ -18,20 +18,13 @@ Data: TypeAlias = Union[
 
 
 @runtime_checkable
-class _Serializabled(Protocol):
+class _Serializable(Protocol):
   """
-  Protocol for objects that can serialize their instance attributes and
-  computed properties into a dictionary.
+  Protocol for objects that expose a serialized representation.
   """
 
-  __dict__: dict[str, Any]
-
-  def serialize(
-    self,
-    *,
-    include_private: bool = False,
-    include_properties: bool = True,
-  ) -> Data: ...
+  @property
+  def serialize(self) -> Data: ...
 
 
 def serialize_value(value: T) -> Any:
@@ -48,11 +41,11 @@ def serialize_value(value: T) -> Any:
   if isinstance(value, (list, tuple, set, frozenset)):
     return [serialize_value(item) for item in value]
 
-  if isinstance(value, _Serializabled):
-    return value.serialize()
+  if isinstance(value, _Serializable):
+    return value.serialize
 
   if hasattr(value, "__dict__"):
-    return serialize_object(value)
+    return serialize_object(value, include_properties=False)
 
   return value
 
@@ -73,23 +66,15 @@ def serialize_object[T](
       include_private:
           Include names beginning with an underscore.
 
-      include_none:
-          Include attributes whose value is None.
-
       include_properties:
           Include values exposed through @property descriptors.
   """
 
-  result: Data = {}
+  result: dict[str, Any] = {}
 
   for name, value in vars(obj).items():
-    # sig = signature(value).return_annotation
-
     if not include_private and name.startswith("_"):
       continue
-
-    # if not include_errors and callable(value):
-    #   continue
 
     result[name] = serialize_value(value)
 

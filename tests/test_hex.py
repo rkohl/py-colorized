@@ -1,5 +1,6 @@
 import pytest
 
+from colorize import Palettes
 from colorize.types.hex import HexColor
 
 
@@ -22,8 +23,9 @@ def test_equivalent_hex_values_compare_equal() -> None:
 
 
 def test_converts_rgb_values() -> None:
-  color = HexColor.from_rgb(51, 102, 153, 128)
+  rgba = Palettes.RGBA(red=51, green=102, blue=153, alpha=128)
+  color = HexColor.from_rgb(rgba)
 
   assert color == HexColor("#33669980")
-  assert color.to_rgb() == (51, 102, 153)
-  assert color.to_rgba() == (51, 102, 153, 128)
+  assert color.to_rgb() == Palettes.RGB(red=51, green=102, blue=153)
+  assert color.to_rgba() == rgba

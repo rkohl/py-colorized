@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Self
 
 from .._util import Serializable
+from .palette import RGB, RGBA
 
 
 @dataclass(frozen=True, slots=True)
@@ -41,10 +42,12 @@ class HexColor(Serializable):
     object.__setattr__(self, "_value", f"#{digits.lower()}")
 
   @classmethod
-  def from_rgb(cls, red: int, green: int, blue: int, alpha: int | None = None) -> Self:
+  def from_rgb(cls, rgba: RGBA | None = None, *, red: int = 0, green: int = 0, blue: int = 0, alpha: int | None = None) -> Self:
     """
     Create a HexColor from RGB or RGBA values.
     """
+    if rgba is not None:
+      red, green, blue, alpha = rgba.red, rgba.green, rgba.blue, rgba.alpha
     channels = (red, green, blue) if alpha is None else (red, green, blue, alpha)
 
     if any(isinstance(channel, bool) or not isinstance(channel, int) or not 0 <= channel <= 255 for channel in channels):
@@ -66,19 +69,20 @@ class HexColor(Serializable):
     """
     return len(self._value) == 9
 
-  def to_rgb(self) -> tuple[int, int, int]:
+  def to_rgb(self) -> RGB:
     """
-    Convert the HexColor to an RGB tuple.
+    Convert the HexColor to an RGB object.
     """
-    return (
-      int(self._value[1:3], 16),
-      int(self._value[3:5], 16),
-      int(self._value[5:7], 16),
+    return RGB(
+      red=int(self._value[1:3], 16),
+      green=int(self._value[3:5], 16),
+      blue=int(self._value[5:7], 16),
     )
 
-  def to_rgba(self) -> tuple[int, int, int, int]:
+  def to_rgba(self) -> RGBA:
     alpha = int(self._value[7:9], 16) if self.has_alpha else 255
-    return *self.to_rgb(), alpha
+    rgb = self.to_rgb()
+    return RGBA(red=rgb.red, green=rgb.green, blue=rgb.blue, alpha=alpha)
 
   def __str__(self) -> str:
     return self._value

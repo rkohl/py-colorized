@@ -1,25 +1,32 @@
-from colorize.color import CAColor, Colorize
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import TYPE_CHECKING
+
+from coloraide import Color as CAColor
 
 from .color import Colors
 from .palette import Triadic
 
+if TYPE_CHECKING:
+  from colorize.color import Colorize
 
-# @dataclass(frozen=True)
+
+@dataclass(frozen=True)
 class Harmonics:
-  _color: Colorize
-  """
-  A collection of color harmonics.
+  """Generate harmonies derived from a base color.
 
   Attributes:
-    `complement`: The complement color.
-    `analogous`: The analogous palette.
-    `triadic`: The triadic palette.
-    `split_complementary`: The split complementary palette.
-    `tetradic`: The tetradic palette.
+    complement: The color opposite the base color on the color wheel.
+    triadic: A three-color palette spaced evenly around the color wheel.
+
+  Methods:
+    analogous: Return the base color and its two analogous colors.
+    split_complementary: Return a split-complementary three-color palette.
+    monochromatic: Return colors with increasing lightness.
   """
 
-  def __init__(self, color: Colorize):
-    self._color = color
+  _color: Colorize
 
   @property
   def complement(self) -> Colorize:
@@ -48,6 +55,8 @@ class Harmonics:
     )
 
   def monochromatic(self, count: int = 7) -> Colors:
+    """Return ``count`` colors with increasing lightness."""
+
     if count < 2:
       raise ValueError("count must be at least two")
     return [

@@ -1,6 +1,9 @@
-from colorize.color import Colorize
+from typing import TYPE_CHECKING
 
-type Colors = list[Colorize]
+if TYPE_CHECKING:
+  from colorize.color import Colorize
+
+type Colors = list["Colorize"]
 """
 Represents a list of colors.
 """
