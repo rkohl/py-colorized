@@ -14,7 +14,7 @@ generation.
 Install the package from this repository:
 
 ```bash
-python -m pip install .
+python pip install py-colorized
 ```
 
 ## Usage

@@ -1,5 +1,5 @@
 [project]
-name = "colorized"
+name = "py-colorized"
 version = "1.0.0"
 description = "Immutable OKLCH color manipulation, harmony, palette, and contrast utilities"
 requires-python = ">=3.12"
