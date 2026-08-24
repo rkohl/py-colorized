@@ -44,12 +44,11 @@ class Colorize(Serializable):
     return f"Colorize('{self.hex}')"
 
   @property
-  def serialize(self) -> Data:
-    """Return the normalized hexadecimal value as built-in Python data."""
-    return {"hex": self.hex.serialize}
-
-  @property
   def oklch(self) -> Palettes.Oklch:
+    """
+    Return the color in OKLCH color space.
+    """
+
     lightness, chroma, hue = self._color.coords()
     return Palettes.Oklch(lightness, chroma, hue)
 
@@ -78,6 +77,13 @@ class Colorize(Serializable):
     return self._from_ca(c)
 
   def darken(self, amount: float) -> Colorize:
+    """
+    Darken the color by a given amount.
+    Example: ``color.darken(0.2)`` will darken the color by 20%.
+
+    Args:
+      - `amount` (float): The amount to darken the color, in the range 0.0 to 1.0.
+    """
     amount = self._clamp_amount(amount)
 
     c = self._color.clone()
@@ -86,6 +92,15 @@ class Colorize(Serializable):
     return self._from_ca(c)
 
   def lighten(self, amount: float) -> Colorize:
+    """
+    Lighten the color by a given amount.
+    Example: ``color.lighten(0.2)`` will lighten the color by 20%.
+
+    Args:
+      - `amount` (float): The amount to lighten the color, in the range
+        0.0 to 1.0.
+    """
+
     amount = self._clamp_amount(amount)
 
     c = self._color.clone()
@@ -95,6 +110,15 @@ class Colorize(Serializable):
     return self._from_ca(c)
 
   def saturate(self, amount: float) -> Colorize:
+    """
+    Saturate the color by a given amount.
+    Example: ``color.saturate(0.2)`` will saturate the color
+    by 20%.
+
+    Args:
+      - `amount` (float): The amount to saturate the color, in the range
+        0.0 to 1.0.
+    """
     amount = self._clamp_amount(amount)
 
     c = self._color.clone()
@@ -103,6 +127,15 @@ class Colorize(Serializable):
     return self._from_ca(c)
 
   def desaturate(self, amount: float) -> Colorize:
+    """
+    Desaturate the color by a given amount.
+    Example: ``color.desaturate(0.2)`` will desaturate the
+    color by 20%.
+
+    Args:
+      - `amount` (float): The amount to desaturate the color, in the
+        range 0.0 to 1.0.
+    """
     amount = self._clamp_amount(amount)
 
     c = self._color.clone()
@@ -111,26 +144,60 @@ class Colorize(Serializable):
     return self._from_ca(c)
 
   def tint(self, amount: float) -> Colorize:
+    """
+    Tint the color by a given amount.
+    Example: ``color.tint(0.2)`` will tint the color by 20%.
+
+    Args:
+      - `amount` (float): The amount to tint the color, in the range
+        0.0 to 1.0.
+    """
     amount = self._clamp_amount(amount)
 
     return self._from_ca(self._color.mix(CAColor("#FFFFFF"), amount, space="oklch"))
 
   def shade(self, amount: float) -> Colorize:
+    """
+    Shade the color by a given amount.
+    Example: ``color.shade(0.2)`` will shade the color by 20%.
+
+    Args:
+      - `amount` (float): The amount to shade the color, in the range
+        0.0 to 1.0.
+    """
     amount = self._clamp_amount(amount)
 
     return self._from_ca(self._color.mix(CAColor("#000000"), amount, space="oklch"))
 
   def tints(self, count: int = 5) -> Colors:
+    """
+    Generate a list of tints of the color.
+    """
+
     if count <= 0:
       raise ValueError("count must be greater than zero")
     return [self.tint(i / count) for i in range(1, count + 1)]
 
   def shades(self, count: int = 5) -> Colors:
+    """
+    Generate a list of shades of the color.
+    """
+
     if count <= 0:
       raise ValueError("count must be greater than zero")
     return [self.shade(i / count) for i in range(1, count + 1)]
 
   def alpha(self, opacity: float = 1.0) -> str:
+    """
+    Return the color as a hexadecimal string with an alpha channel.
+    Example: ``color.alpha(0.5)`` will return the color as a hexadecimal
+    string with 50% opacity.
+
+    Args:
+      - `opacity` (float): The opacity of the color, in the range 0
+        to 1.0. Defaults to 1.0 (fully opaque).
+    """
+
     opacity = self._clamp_amount(opacity)
 
     color = self._color.clone()
@@ -154,9 +221,20 @@ class Colorize(Serializable):
   # ------------------------------------------------------------
 
   def contrast_ratio(self, other: Colorize | None = None) -> float:
+    """
+    Get the contrast ratio between this color and another color.
+    If no other color is provided, the contrast ratio is calculated against white.
+    """
+
     return self._color.contrast(other._color if other else CAColor("#FFFFFF"))
 
   def wcag(self, *, contrasting_with: Colorize | None = None) -> WCAG:
+    """
+    Get the WCAG contrast ratio and compliance level for this
+    color against another color.
+    If no other color is provided, the contrast ratio is
+    calculated against white.
+    """
     return WCAG(self, compared=contrasting_with)
 
   # ------------------------------------------------------------
@@ -199,3 +277,19 @@ class Colorize(Serializable):
       split_complementary=self.harmonies.split_complementary(),
       palette=self.palette,
     )
+
+  @property
+  def serialize(self) -> Data:
+    """Return the color values as built-in Python data."""
+    return {
+      "hex": self.hex.hex,
+      "alpha": self.hex.has_alpha,
+      "lightness": self.lightness,
+      "chroma": self.chroma,
+      "hue": self.hue,
+    }
+
+  @property
+  def _serialize_reference(self) -> Data:
+    """Return the compact representation used when nested in other values."""
+    return {"hex": self.hex.serialize}

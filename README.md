@@ -119,8 +119,8 @@ available from `colorize.types`.
 | `dual.colors`, `triadic.colors` | `list[Colorize]` | Palette colors in field order |
 | `quadratic.colors` | `list[Colorize]` | Four palette colors in field order |
 | `harmonies.monochromatic()` | `list[Colorize]` | Monochromatic color scale |
-| `contrast_ratio()` | `float` | WCAG contrast ratio |
-| `wcag()` | `WCAG` | Contrast and accessibility helper |
+| `contrast_ratio()` | `float` | Contrast ratio against another color, or white by default |
+| `wcag(contrasting_with=...)` | `WCAG` | Accessibility helper using the provided color, or white by default |
 | `wcag().rating` | `Rating` | Ratio with `aa` and `aaa` `Level` results |
 | `wcag().best_text_color()`, `wcag().shade()` | `Colorize` | Contrast-selected color |
 | `palette` | `dict[int, Colorize]` | Palette keyed by stops from `50` through `950` |
@@ -153,14 +153,29 @@ Use `.serialize` to convert colors, harmonies, RGB values, palettes, WCAG
 ratings, and themes to built-in Python values:
 
 ```python
-print(brand.serialize)
-# {"hex": {"has_alpha": False, "hex": "#336699"}}
+data = brand.serialize
+
+print(data["hex"])  # #336699
+print(data["alpha"])  # False
+print(data["lightness"])  # 0.4993144558452082
+print(data["chroma"])  # 0.09866437712418324
+print(data["hue"])  # 250.4330574201755
 
 print(brand.harmonies.serialize["complement"])
-# {"hex": {"has_alpha": False, "hex": "#865815"}}
+# {"hex": "#865815" ... }
 ```
 
-## Development
+```json
+{
+  "hex": "#336699",
+  "alpha": False,
+  "lightness": 0.4993144558452082,
+  "chroma": 0.09866437712418324,
+  "hue": 250.4330574201755
+}
+```
+
+## Tests
 
 Run the verification checks from the project root:
 

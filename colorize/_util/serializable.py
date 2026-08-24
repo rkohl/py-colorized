@@ -33,6 +33,14 @@ class _Serializable(Protocol):
   def serialize(self) -> Data: ...
 
 
+@runtime_checkable
+class _ReferenceSerializable(Protocol):
+  """Protocol for objects with a compact nested representation."""
+
+  @property
+  def _serialize_reference(self) -> Data: ...
+
+
 def serialize_value(value: object) -> Any:
   """
   Recursively convert a value into a serialization-safe representation.
@@ -46,6 +54,9 @@ def serialize_value(value: object) -> Any:
 
   if isinstance(value, (list, tuple, set, frozenset)):
     return [serialize_value(item) for item in value]
+
+  if isinstance(value, _ReferenceSerializable):
+    return value._serialize_reference
 
   if isinstance(value, _Serializable):
     return value.serialize

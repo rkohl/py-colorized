@@ -182,8 +182,16 @@ class TestContrastAndGeneratedOutput:
   def test_color_and_harmonies_serialize_without_recursion(self) -> None:
     color = Colorize("#336699")
 
-    assert color.serialize == {"hex": {"hex": "#336699", "has_alpha": False}}
-    assert color.harmonies.serialize["complement"] == color.harmonies.complement.serialize
+    serialized = color.serialize
+
+    assert serialized == {
+      "hex": "#336699",
+      "alpha": False,
+      "lightness": color.lightness,
+      "chroma": color.chroma,
+      "hue": color.hue,
+    }
+    assert color.harmonies.serialize["complement"] == color.harmonies.complement._serialize_reference
 
   def test_palette_models_are_available_from_public_namespace(self) -> None:
     primary = Colorize("#336699")
