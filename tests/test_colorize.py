@@ -2,8 +2,8 @@ import math
 
 import pytest
 
-from colorize import Colorize, ColorTheme, HexColor, Palettes
-from colorize.types import Colors, Level, Rating
+from colorized import Colorize, ColorTheme, HexColor, Palettes
+from colorized.types import Colors, Level, Rating
 
 
 def hue_distance(left: float, right: float) -> float:

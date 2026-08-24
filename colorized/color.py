@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 
 from coloraide import Color as CAColor
 
-from colorize.types import WCAG, Colors, ColorTheme, Harmonics, HexColor, Palettes
+from colorized.types import WCAG, Colors, ColorTheme, Harmonics, HexColor, Palettes
 
 from ._util import Data, Serializable
 

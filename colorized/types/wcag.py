@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from .._util import Serializable
 
 if TYPE_CHECKING:
-  from colorize.color import Colorize
+  from colorized.color import Colorize
 
 
 class WCAG(Serializable):
@@ -32,7 +32,7 @@ class WCAG(Serializable):
   """
 
   def __init__(self, color: Colorize, *, compared: Colorize | None = None) -> None:
-    from colorize.color import Colorize
+    from colorized.color import Colorize
 
     self._color: Colorize = color
     self._compare: Colorize = Colorize("#FFFFFF") if compared is None else compared
@@ -53,7 +53,7 @@ class WCAG(Serializable):
     return self._color._color.contrast(other._color)
 
   def best_text_color(self, *, light: Colorize | None = None, dark: Colorize | None = None) -> Colorize:
-    from colorize.color import Colorize
+    from colorized.color import Colorize
 
     if light is None:
       light = Colorize("#FFFFFF")

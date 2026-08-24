@@ -7,7 +7,7 @@ from .._util import Serializable
 from .palette import Full, Triadic
 
 if TYPE_CHECKING:
-  from colorize.color import Colorize
+  from colorized.color import Colorize
 
 
 @dataclass(frozen=True)

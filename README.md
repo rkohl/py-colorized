@@ -8,7 +8,6 @@ generation.
 ## Requirements
 
 - Python 3.12 or newer
-- `coloraide`
 
 ## Installation
 
@@ -16,12 +15,6 @@ Install the package from this repository:
 
 ```bash
 python -m pip install .
-```
-
-For local development, install the test and lint tools too:
-
-```bash
-python -m pip install -e '.[dev]'
 ```
 
 ## Usage

@@ -10,7 +10,7 @@ from .color import Colors
 from .palette import Triadic
 
 if TYPE_CHECKING:
-  from colorize.color import Colorize
+  from colorized.color import Colorize
 
 
 @dataclass(frozen=True)

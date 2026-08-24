@@ -1,7 +1,7 @@
 import pytest
 
-from colorize import Palettes
-from colorize.types.hex import HexColor
+from colorized import Palettes
+from colorized.types.hex import HexColor
 
 
 def test_normalizes_hex_values() -> None:

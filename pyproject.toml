@@ -24,10 +24,10 @@ requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["colorize*"]
+include = ["colorized*"]
 
 [tool.setuptools.package-data]
-colorize = ["py.typed"]
+colorized = ["py.typed"]
 
 [tool.pytest.ini_options]
 addopts = "-ra"

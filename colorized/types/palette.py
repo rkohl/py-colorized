@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from .._util import Serializable
 
 if TYPE_CHECKING:
-  from colorize.color import Colorize
+  from colorized.color import Colorize
 
 
 @dataclass(frozen=True)
