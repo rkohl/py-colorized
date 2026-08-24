@@ -1,0 +1,52 @@
+[project]
+name = "colorize"
+version = "1.0.0"
+description = "Immutable OKLCH color manipulation, harmony, palette, and contrast utilities"
+requires-python = ">=3.12"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+  { name = "Ryan Kohl" }
+]
+dependencies = [
+  "coloraide",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+  "ruff",
+]
+
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["colorize*"]
+
+[tool.setuptools.package-data]
+colorize = ["py.typed"]
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+testpaths = ["tests"]
+xfail_strict = true
+
+[tool.pyright]
+indentSize = 2
+indentStyle = "space"
+
+[tool.ruff.format]
+# https://beta.ruff.rs/docs/configuration/
+indent-style = "space"
+
+
+[tool.ruff]
+line-length = 140
+indent-width = 2
+
+[tool.ruff.lint]
+select = ['E', 'W', 'F', 'I', 'B', 'C4', 'ARG', 'SIM']
+ignore = ['W291', 'W292', 'W293', 'E741', 'E743']
