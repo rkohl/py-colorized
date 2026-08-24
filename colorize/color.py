@@ -143,10 +143,11 @@ class Colorize:
     return WCAG(self, other)
 
   # ------------------------------------------------------------
-  # PALETTE GENERATION
+  # PALETTE/THEME
   # ------------------------------------------------------------
 
-  def generate_palette(self) -> Palettes.Full:
+  @property
+  def palette(self) -> Palettes.Full:
     hue = self.hue
     chroma = self.chroma
 
@@ -166,11 +167,8 @@ class Colorize:
 
     return {k: self._from_ca(CAColor("oklch", [l, chroma, hue])) for k, l in stops.items()}
 
-  # ------------------------------------------------------------
-  # THEME
-  # ------------------------------------------------------------
-
-  def generate_theme(self) -> ColorTheme:
+  @property
+  def theme(self) -> ColorTheme:
     return ColorTheme(
       primary=self,
       primary_text=self.wcag().best_text_color(),
@@ -178,5 +176,5 @@ class Colorize:
       analogous=self.harmonies.analogous(),
       triadic=self.harmonies.triadic,
       split_complementary=self.harmonies.split_complementary(),
-      palette=self.generate_palette(),
+      palette=self.palette,
     )
