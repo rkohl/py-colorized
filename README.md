@@ -1,6 +1,6 @@
-# Py Colorized
+# py-colorized
 
-Py Colorized is a small, typed Python library for manipulating colors in the OKLCH
+py-colorized is a small, typed Python library for manipulating colors in the OKLCH
 color space. It provides immutable color values, lightness and saturation
 adjustments, color harmonies, WCAG contrast helpers, and palette/theme
 generation.
