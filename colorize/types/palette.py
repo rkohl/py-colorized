@@ -67,6 +67,13 @@ class DualPalette(Serializable):
   primary: Colorize
   secondary: Colorize
 
+  @property
+  def colors(self) -> list[Colorize]:
+    """
+    Return the colors in the palette as a list.
+    """
+    return [self.primary, self.secondary]
+
 
 @dataclass(frozen=True)
 class TriadicPalette(Serializable):
@@ -84,6 +91,13 @@ class TriadicPalette(Serializable):
   primary: Colorize
   secondary: Colorize
   tertiary: Colorize
+
+  @property
+  def colors(self) -> list[Colorize]:
+    """
+    Return the colors in the palette as a list.
+    """
+    return [self.primary, self.secondary, self.tertiary]
 
 
 @dataclass(frozen=True)
@@ -103,6 +117,13 @@ class OklchPalette(Serializable):
   lightness: float
   chroma: float
   hue: float
+
+  @property
+  def values(self) -> list[float]:
+    """
+    Return the palette as an OKLCH list.
+    """
+    return [self.lightness, self.chroma, self.hue]
 
 
 @dataclass(frozen=True)
@@ -124,6 +145,13 @@ class QuadraticPalette(Serializable):
   secondary: Colorize
   tertiary: Colorize
   quaternary: Colorize
+
+  @property
+  def colors(self) -> list[Colorize]:
+    """
+    Return the colors in the palette as a list.
+    """
+    return [self.primary, self.secondary, self.tertiary, self.quaternary]
 
 
 Dual = DualPalette

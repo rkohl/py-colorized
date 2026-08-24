@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from coloraide import Color as CAColor
 
+from .._util import Serializable
 from .color import Colors
 from .palette import Triadic
 
@@ -13,7 +14,7 @@ if TYPE_CHECKING:
 
 
 @dataclass(frozen=True)
-class Harmonics:
+class Harmonics(Serializable):
   """Generate harmonies derived from a base color.
 
   Attributes:

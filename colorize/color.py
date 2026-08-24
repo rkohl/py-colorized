@@ -6,9 +6,11 @@ from coloraide import Color as CAColor
 
 from colorize.types import WCAG, Colors, ColorTheme, Harmonics, HexColor, Palettes
 
+from ._util import Data, Serializable
+
 
 @dataclass(frozen=True)
-class Colorize:
+class Colorize(Serializable):
   """An immutable hexadecimal color backed by the OKLCH color space.
 
   ``Colorize`` normalizes hexadecimal input and exposes operations for color
@@ -40,6 +42,11 @@ class Colorize:
 
   def __repr__(self) -> str:
     return f"Colorize('{self.hex}')"
+
+  @property
+  def serialize(self) -> Data:
+    """Return the normalized hexadecimal value as built-in Python data."""
+    return {"hex": self.hex.serialize}
 
   @property
   def oklch(self) -> Palettes.Oklch:
@@ -149,8 +156,8 @@ class Colorize:
   def contrast_ratio(self, other: Colorize | None = None) -> float:
     return self._color.contrast(other._color if other else CAColor("#FFFFFF"))
 
-  def wcag(self, other: Colorize | None = None) -> WCAG:
-    return WCAG(self, other)
+  def wcag(self, *, contrasting_with: Colorize | None = None) -> WCAG:
+    return WCAG(self, compared=contrasting_with)
 
   # ------------------------------------------------------------
   # PALETTE/THEME

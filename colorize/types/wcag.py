@@ -31,11 +31,11 @@ class WCAG(Serializable):
     - `serialize`: A property that returns a dictionary representation of the object.
   """
 
-  def __init__(self, color: Colorize, *, compare: Colorize | None = None) -> None:
+  def __init__(self, color: Colorize, *, compared: Colorize | None = None) -> None:
     from colorize.color import Colorize
 
     self._color: Colorize = color
-    self._compare: Colorize = Colorize("#FFFFFF") if compare is None else compare
+    self._compare: Colorize = Colorize("#FFFFFF") if compared is None else compared
 
   @property
   def ratio(self) -> float:

@@ -131,7 +131,7 @@ class TestContrastAndGeneratedOutput:
     white = Colorize("#ffffff")
 
     assert black.contrast_ratio(white) == pytest.approx(21)
-    assert black.wcag(white).rating == Rating(
+    assert black.wcag(contrasting_with=white).rating == Rating(
       ratio=21.0,
       aa=Level(normal=True, large=True),
       aaa=Level(normal=True, large=True),
@@ -178,6 +178,12 @@ class TestContrastAndGeneratedOutput:
 
     assert serialized["primary"] == {"hex": {"hex": "#336699", "has_alpha": False}}
     assert serialized["palette"][500] == serialized["primary"]
+
+  def test_color_and_harmonies_serialize_without_recursion(self) -> None:
+    color = Colorize("#336699")
+
+    assert color.serialize == {"hex": {"hex": "#336699", "has_alpha": False}}
+    assert color.harmonies.serialize["complement"] == color.harmonies.complement.serialize
 
   def test_palette_models_are_available_from_public_namespace(self) -> None:
     primary = Colorize("#336699")

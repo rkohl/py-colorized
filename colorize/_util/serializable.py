@@ -1,15 +1,21 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from inspect import getmembers
-from typing import Any, Protocol, TypeAlias, TypeVar, Union, runtime_checkable
+from typing import TYPE_CHECKING, Any, Protocol, TypeAlias, Union, runtime_checkable
 
-T = TypeVar("T")
+if TYPE_CHECKING:
+  from ..color import Colorize
+
 Data: TypeAlias = Union[
-  dict[str, "Data"],
+  Mapping[str, "Data"],
+  Mapping[int, "Data"],
   list["Data"],
   str,
   int,
   float,
+  "Colorize",
+  bool,
 ]
 """
  Type alias for data that can be serialized to python types.
@@ -27,7 +33,7 @@ class _Serializable(Protocol):
   def serialize(self) -> Data: ...
 
 
-def serialize_value(value: T) -> Any:
+def serialize_value(value: object) -> Any:
   """
   Recursively convert a value into a serialization-safe representation.
   """
@@ -50,8 +56,8 @@ def serialize_value(value: T) -> Any:
   return value
 
 
-def serialize_object[T](
-  obj: T,
+def serialize_object(
+  obj: object,
   *,
   include_private: bool = False,
   include_properties: bool = True,

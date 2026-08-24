@@ -39,7 +39,7 @@ print(brand.alpha(0.5))  # #33669980
 palette = brand.palette
 print(palette[500])  # #336699
 
-rating = brand.wcag(Colorize("#ffffff")).rating
+rating = brand.wcag(contrasting_with=Colorize("#ffffff")).rating
 print(rating.aa.normal)  # True
 ```
 
@@ -52,10 +52,24 @@ print(brand.tint(0.2).lighten(0.4))  # #8bb6e2
 print(brand.lighten(0.4).alpha(0.5))  # #6ea3da80
 ```
 
-Adjustment amounts are clamped to the inclusive range `0.0` to `1.0`. Methods
-return new `Colorize` values and leave the original unchanged. Three- and
-six-digit hex values are supported, as are four- and eight-digit values with an
-alpha channel.
+## Adjustment values
+
+Adjustment values are proportions from `0.0` to `1.0`. For example,
+`brand.lighten(0.2)` lightens the color by 20%, moving its OKLCH lightness 20%
+of the remaining distance toward white.
+
+- `darken(0.2)` reduces the current lightness by 20%.
+- `saturate(0.2)` increases the current chroma by 20%.
+- `desaturate(0.2)` reduces the current chroma by 20%.
+- `tint(0.2)` mixes in 20% white, while `shade(0.2)` mixes in 20% black.
+- `alpha(0.5)` sets the color to 50% opacity.
+
+Values outside the supported range are clamped: negative values become `0.0`,
+and values greater than `1.0` become `1.0`. Adjustment methods return new
+`Colorize` values and leave the original unchanged.
+
+Three- and six-digit hex values are supported, as are four- and eight-digit
+values with an alpha channel.
 
 ## HexColor
 
@@ -76,9 +90,7 @@ print(color.to_rgba().rgba)  # [170, 187, 204, 136]
 green = HexColor.from_rgb(red=0, green=128, blue=0)
 print(green)  # #008000
 
-transparent_blue = HexColor.from_rgb(
-    Palettes.RGBA(red=51, green=102, blue=153, alpha=128)
-)
+transparent_blue = HexColor.from_rgb(Palettes.RGBA(red=51, green=102, blue=153, alpha=128))
 print(transparent_blue)  # #33669980
 ```
 
@@ -94,6 +106,7 @@ available from `colorize.types`.
 | `HexColor.to_rgb()` | `Palettes.RGB` | Named red, green, and blue channels |
 | `HexColor.to_rgba()` | `Palettes.RGBA` | Named red, green, blue, and alpha channels |
 | `color.oklch` | `Palettes.Oklch` | Named `lightness`, `chroma`, and `hue` values |
+| `color.oklch.values` | `list[float]` | OKLCH components in lightness, chroma, hue order |
 | `color.lightness`, `color.chroma`, `color.hue` | `float` | Individual OKLCH components |
 | `rotate_hue()`, `darken()`, `lighten()` | `Colorize` | Adjusted immutable color |
 | `saturate()`, `desaturate()`, `tint()`, `shade()` | `Colorize` | Adjusted immutable color |
@@ -103,6 +116,8 @@ available from `colorize.types`.
 | `harmonies.complement` | `Colorize` | Complementary color |
 | `harmonies.analogous()`, `harmonies.triadic` | `Palettes.Triadic` | Named three-color palette |
 | `harmonies.split_complementary()` | `Palettes.Triadic` | Named split-complementary palette |
+| `dual.colors`, `triadic.colors` | `list[Colorize]` | Palette colors in field order |
+| `quadratic.colors` | `list[Colorize]` | Four palette colors in field order |
 | `harmonies.monochromatic()` | `list[Colorize]` | Monochromatic color scale |
 | `contrast_ratio()` | `float` | WCAG contrast ratio |
 | `wcag()` | `WCAG` | Contrast and accessibility helper |
@@ -111,7 +126,7 @@ available from `colorize.types`.
 | `palette` | `dict[int, Colorize]` | Palette keyed by stops from `50` through `950` |
 | `theme` | `ColorTheme` | Complete generated color theme |
 
-Palette results expose named fields rather than tuple indexes:
+Palette results expose both named fields and ordered list helpers:
 
 ```python
 from colorize import Colorize, Palettes
@@ -122,19 +137,28 @@ brand = Colorize("#336699")
 oklch: Palettes.Oklch = brand.oklch
 harmonies: Harmonics = brand.harmonies
 analogous: Palettes.Triadic = harmonies.analogous()
-wcag: WCAG = brand.wcag(Colorize("#ffffff"))
+wcag: WCAG = brand.wcag(contrasting_with=Colorize("#ffffff"))
 rating: Rating = wcag.rating
 theme = brand.theme
 
 print(oklch.lightness)
+assert oklch.values == [oklch.lightness, oklch.chroma, oklch.hue]
 print(analogous.primary, analogous.secondary, analogous.tertiary)
+assert analogous.colors == [analogous.primary, analogous.secondary, analogous.tertiary]
 print(rating.aa == Level(normal=True, large=True))  # True
 print(theme.primary)  # #336699
 ```
 
-The `RGB`, palette, WCAG rating, and theme models implement the `Serializable`
-protocol and expose a `.serialize` property for conversion to built-in Python
-values.
+Use `.serialize` to convert colors, harmonies, RGB values, palettes, WCAG
+ratings, and themes to built-in Python values:
+
+```python
+print(brand.serialize)
+# {"hex": {"has_alpha": False, "hex": "#336699"}}
+
+print(brand.harmonies.serialize["complement"])
+# {"hex": {"has_alpha": False, "hex": "#865815"}}
+```
 
 ## Development
 
